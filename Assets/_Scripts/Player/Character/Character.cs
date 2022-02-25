@@ -9,6 +9,7 @@ public class Character : PooledMonoBehaviour
     public event Action<int> Finished;
     public CharacterType CharacterType => _characterType;
     public override int InitialPoolSize => 1;
+    public float CharacterPosition => transform.position.z;
 
     [SerializeField] CharacterType _characterType = CharacterType.Standard;
     private CharacterAnimationController _animator;

@@ -4,12 +4,13 @@ using UnityEngine;
 public class InputController : MonoBehaviour
 {
     public static event Action Click;
-    public static event Action<SwipeDirection> Swipe;
+    public static event Action<float>Swerve;
     public static event Action BackClicked;
     
 
     private static InputController _instance = null;
-    private Vector3 _mouseClickPosition;
+    private float _mouseClickPosition;
+    private Camera _mainCamera;
 
     private void Awake()
     {
@@ -20,6 +21,8 @@ public class InputController : MonoBehaviour
         }
 
         _instance = this;
+
+        _mainCamera = Camera.main;
     }
 
     private void Update()
@@ -37,36 +40,29 @@ public class InputController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            _mouseClickPosition = Input.mousePosition;
+            _mouseClickPosition = Input.mousePosition.x;
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            float distanceMovedPercent = GetInWorldMovementPercent(Input.mousePosition.x - _mouseClickPosition);
+
+            // Small touch not counts as swipe
+            if (Mathf.Abs(distanceMovedPercent) < 0.001f)
+                return;
+
+            Swerve?.Invoke(distanceMovedPercent);
+            _mouseClickPosition = Input.mousePosition.x;
         }
         
         if (Input.GetMouseButtonUp(0))
         {
             Click?.Invoke();
-
-            Vector3 clickDirection = Input.mousePosition - _mouseClickPosition;
-
-            // Small touch not counts as swipe
-            if (clickDirection.magnitude < 0.02f)
-                return;
-
-            if (clickDirection.y > 0 && clickDirection.y > 2f * Mathf.Abs(clickDirection.x))
-            {
-                Swipe?.Invoke(SwipeDirection.Up);
-                return;
-            }
-
-            if (clickDirection.x > 0)
-            {
-                Swipe?.Invoke(SwipeDirection.Right);
-                return;
-            }
-            
-            if (clickDirection.x < 0)
-            {
-                Swipe?.Invoke(SwipeDirection.Left);
-                return;
-            }
         }
+    }
+
+    private float GetInWorldMovementPercent(float distanceMoved)
+    {
+        return distanceMoved / _mainCamera.scaledPixelWidth;
     }
 }

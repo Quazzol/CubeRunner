@@ -19,6 +19,9 @@ public class GameUIManager : MonoBehaviour
     [Header("Text Fields")]
     [SerializeField] private TextMeshProUGUI _txtLives;
     [SerializeField] private TextMeshProUGUI _txtCollected;
+
+    [Header("Images")]
+    [SerializeField] private Image _imgMapCoveredAmount;
     
 
     private void Start()
@@ -41,6 +44,11 @@ public class GameUIManager : MonoBehaviour
     public void UpdateLives(int lives)
     {
         _txtLives.text = lives.ToString();
+    }
+
+    public void UpdateMapPercent(float percent)
+    {
+        _imgMapCoveredAmount.fillAmount = percent;
     }
 
     public void ShowLoseMenu(int lostCollected, int currentLevel, int totalCollected)

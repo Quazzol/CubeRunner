@@ -27,6 +27,11 @@ public class GameManager : MonoBehaviour
         PrepareLevel();
     }
 
+    private void Update()
+    {
+        _uiManager.UpdateMapPercent(LevelCompletePercent());
+    }
+
     private void OnDisable()
     {
         InputController.Click -= OnClicked;
@@ -42,6 +47,11 @@ public class GameManager : MonoBehaviour
         PoolOwner.ClearPool();
     }
 
+    private float LevelCompletePercent()
+    {
+        return (_player.CharacterPosition / _levelManager.LevelLength);
+    }
+
     private void PrepareLevel()
     {
         ParticleCreator.Instance.Reset();
@@ -54,6 +64,7 @@ public class GameManager : MonoBehaviour
 
         _uiManager.UpdateLives(_player.Health);
         _uiManager.UpdateCollected(0);
+        _uiManager.UpdateMapPercent(0);
     }
 
     private void CreatePlayer()

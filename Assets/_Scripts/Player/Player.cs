@@ -14,6 +14,7 @@ public class Player
     public int TotalCollected => _info.Collected;
     public int Health => _info.Health;
     public int CollectionMultiplier => _info.CollectionMultiplier;
+    public float CharacterPosition => _character.CharacterPosition;
 
     private Character _character;
     private List<Character> _characterPrefabs;

@@ -9,22 +9,20 @@ public class CharacterMovementController : IDisposable
     
     private Transform _transform;
     private Rigidbody _rigidbody;
-    private CharacterSide _side;
-    private Vector3 _sideDirection;
+    private float _sideMovement;
     private bool _isGrounded = true;
 
     public CharacterMovementController(Transform transform, Rigidbody rigidbody)
     {
         _transform = transform;
         _rigidbody = rigidbody;
-        InputController.Swipe += OnSwiped;
+        InputController.Swerve += OnSwerve;
     }
 
     public void Reset()
     {
         _transform.position = Vector3.left;
-        _side = CharacterSide.Left;
-        _sideDirection = Vector3.zero;
+        _sideMovement = 0;
         _isGrounded = true;
     }
 
@@ -45,16 +43,13 @@ public class CharacterMovementController : IDisposable
 
     private void MoveSides()
     {
-        if (!_sideDirection.AreEqual(Vector3.zero))
+        if (!_sideMovement.AreEqual(0))
         {
             Vector3 target = _transform.position;
-            target.x = _sideDirection.x;
-            _transform.position = Vector3.MoveTowards(_transform.position, target, Time.deltaTime * MovementSpeed);
-
-            if (_transform.position.x.AreEqual(target.x))
-            {
-                _sideDirection = Vector3.zero;
-            }
+            target.x = Mathf.Clamp(target.x + _sideMovement, -1, 1);
+            
+            _transform.position = target;
+            _sideMovement = 0;
         }
     }
 
@@ -66,48 +61,16 @@ public class CharacterMovementController : IDisposable
         _isGrounded = Physics.Raycast(_transform.position, _transform.TransformDirection(Vector3.down), .1f, ~LayerMask.NameToLayer("Road"));
     }
 
-    private void OnSwiped(SwipeDirection direction)
+    private void OnSwerve(float movementPosition)
     {
         if (!IsActive)
             return;
 
-        switch (direction)
-        {
-            case SwipeDirection.Up: OnSwipeUp(); break;
-            case SwipeDirection.Left: OnSwipeLeft(); break;
-            case SwipeDirection.Right: OnSwipeRight(); break;
-        }
-    }
-
-    private void OnSwipeUp()
-    {
-        if (!_isGrounded)
-            return;
-
-        _rigidbody.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
-        _isGrounded = false;
-    }
-
-    private void OnSwipeRight()
-    {
-        if (_side != CharacterSide.Right)
-        {
-            _side++;
-            _sideDirection = Vector3.right;
-        }
-    }
-
-    private void OnSwipeLeft()
-    {
-        if (_side != CharacterSide.Left)
-        {
-            _side--;
-            _sideDirection = Vector3.left;
-        }
+        _sideMovement = movementPosition * MovementSpeed;
     }
 
     public void Dispose()
     {
-        InputController.Swipe -= OnSwiped;
+        InputController.Swerve -= OnSwerve;
     }
 }

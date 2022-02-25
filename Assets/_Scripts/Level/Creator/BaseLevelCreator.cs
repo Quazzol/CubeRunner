@@ -27,7 +27,7 @@ public abstract class BaseLevelCreator : ILevelCreator
         _endZonePrefabs.AddRange(Resources.LoadAll<PooledMonoBehaviour>("Prefabs/EndSections"));
     }
 
-    public GameObject CreateLevel()
+    public float CreateLevel()
     {
         ReleaseCurrentLevel();
 
@@ -39,7 +39,7 @@ public abstract class BaseLevelCreator : ILevelCreator
         pathLength = CreateMidSection(_path, pathLength);
         CreateEndSection(_path, pathLength);
 
-        return _path;
+        return pathLength;
     }
 
     protected virtual void ReleaseCurrentLevel()
